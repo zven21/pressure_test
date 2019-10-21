@@ -9,3 +9,11 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+alias PressureTest.Repo
+alias PressureTest.Posts.Post
+
+1..1000
+|> Enum.each(fn x ->
+  Repo.insert(%Post{title: "title #{x}", desc: "desc: #{x}"})
+end)

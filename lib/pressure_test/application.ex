@@ -6,13 +6,17 @@ defmodule PressureTest.Application do
   use Application
 
   def start(_type, _args) do
+    import Supervisor.Spec
+
     # List all child processes to be supervised
     children = [
       # Start the Ecto repository
       PressureTest.Repo,
       # Start the endpoint when the application starts
-      PressureTestWeb.Endpoint
+      PressureTestWeb.Endpoint,
+      worker(Cachex, [:page_cache, []])
       # Starts a worker by calling: PressureTest.Worker.start_link(arg)
+      # {Cachex, [:page_cache, []]}
       # {PressureTest.Worker, arg},
     ]
 
