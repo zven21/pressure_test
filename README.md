@@ -2,19 +2,46 @@
 
 To start your Phoenix server:
 
-  * Install dependencies with `mix deps.get`
-  * Create and migrate your database with `mix ecto.setup`
-  * Install Node.js dependencies with `cd assets && npm install`
-  * Start Phoenix endpoint with `mix phx.server`
+* Install dependencies with `mix deps.get`
+* Create and migrate your database with `mix ecto.setup`
+* Install Node.js dependencies with `cd assets && npm install`
+* Start Phoenix endpoint with `mix phx.server`
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+Test pressure with apache ab: `ab -n 2000 -c 500 http://dev-m.helijia.com:4000/posts`
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+Solve the pressure bottleneck through two aspects:
 
-## Learn more
+* Pool size and queue target for database connections
+* Add cache
 
-  * Official website: http://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Mailing list: http://groups.google.com/group/phoenix-talk
-  * Source: https://github.com/phoenixframework/phoenix
+Pressure measurement result:
+
+    # pool_size: 10, queue_target: 50
+    Complete requests:      2000
+    Failed requests:        467
+    Requests per second:    153.79 [#/sec] (mean)
+    Time per request:       3251.197 [ms] (mean)
+
+    # pool_size: 10, queue_target: 200
+    Complete requests:      2000
+    Failed requests:        273
+    Requests per second:    141.60 [#/sec] (mean)
+    Time per request:       3531.116 [ms] (mean)
+
+    # pool_size: 20, queue_target: 200
+    Complete requests:      2000
+    Failed requests:        268
+    Requests per second:    141.02 [#/sec] (mean)
+    Time per request:       3545.704 [ms] (mean)
+
+    # pool_size: 40, queue_target: 200
+    Complete requests:      2000
+    Failed requests:        159
+    Requests per second:    141.95 [#/sec] (mean)
+    Time per request:       3522.346 [ms] (mean)
+
+    # pool_size: 10, queue_target: 50 + cachex
+    Complete requests:      2000
+    Failed requests:        0
+    Requests per second:    394.64 [#/sec] (mean)
+    Time per request:       1266.990 [ms] (mean)
